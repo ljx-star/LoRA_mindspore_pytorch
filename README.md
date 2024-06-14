@@ -8,11 +8,11 @@ LoRA模型，全称Low-Rank Adaptation of Large Language Models，是一种用�
 ## 1.2 论文方法  
 LoRA 对Stable Diffusion模型中最关键的部分进行微小改动：交叉注意力层。这是模型中图像和提示相遇的部分。论文发现，仅微调模型的这一部分就足以实现良好的训练效果。交叉注意力层在下方的Stable Diffusion模型架构中以黄色部分表示。
 
-
+ ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%871.png)  
 
 LoRA 通过在冻结原始权重的同时学习秩分解矩阵对来减少可训练参数的数量。 这大大降低了适用于特定任务的大型语言模型的存储需求，并在部署期间实现了高效的任务切换，所有这些都不会引入推理延迟。 LoRA 还优于其他几种适配方法，包括适配器、前缀调整和微调。使用 RoBERTa （Liu et al.， 2019） base and large 和 DeBERTa （He et al.， 2020） XXL 1.5B 在 GLUE 基准上获得与完全微调相当或优于完全微调的结果，同时仅训练和存储一小部分参数。
 在 GPT-2 上，LoRA 与完全微调和其他高效调优方法相比都具有优势，在 E2E NLG Challenge、DART 和 WebNLG 上进行了评估。
-
+![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%872.png)  
 # 2. 数据集介绍
 使用包括WikiText2、2SST-2、IMDB、AG-News、COLA等常用的大模型数据集  
 ## 2.1 WikiText2数据集
@@ -43,7 +43,9 @@ pip install loralib
 ```
 ## 3.2 运行代码  
 先进行LoRA微调，随后进行测评。  
-分别基于NLU和NLU进行LoRA微调。  
+分别基于NLU和NLU进行LoRA微调。    
+![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%873.png)   
+![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%874.png)  
 # 4. Mindspore实现  
 ## 4.1 框架介绍  
 昇思MindSpore是由华为于2019年8月推出的新一代全场景AI框架，2020年3月28日，华为宣布昇思MindSpore正式开源。昇思MindSpore是一个全场景AI框架，旨在实现易开发、高效执行、全场景统一部署三大目标。
