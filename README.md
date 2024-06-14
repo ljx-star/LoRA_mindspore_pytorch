@@ -320,6 +320,32 @@ MindSpore采用动态计算图的方式，允许你在运行时动态地构建�
 在MindSpore中，操作符是用来进行各种数学和逻辑运算的函数或方法。它们可以用于对张量进行加法、乘法、卷积等操作，构建复杂的计算流程。    
 ## 3.2 环境准备  
 基于华为云服务区，在Modelarts中创建mindspore_2.1.0-cann_6.3.2-py_3.7-euler_2.10.7-aarch64-snt9b环境（Ascend Snt9b+ARM algorithm development and training. MindSpore is preset in the AI engine.）
+主要目录： 
+1、gpt2
+```bash  
+ gpt2
+    ├── __init__.py
+    ├── convert_weight.py           # 权重转换脚本
+    ├── gpt2.py                     # 模型实现
+    ├── gpt2_config.py              # 模型配置项
+    ├── gpt2_processor.py           # gpt2预处理
+    ├── gpt2_tokenizer.py           # tokenizer
+    └── gpt2_modules.py             # transformer层实现
+```
+
+2、模型配置：`configs/gpt2`
+
+```bash
+gpt2
+    ├── run_gpt2.yaml           # gpt2 small模型启动配置
+    ├── run_gpt2_13b.yaml       # gpt 13b模型启动配置
+    ├── run_gpt2_52b.yaml       # gpt 52b模型启动配置
+    ├── run_gpt2_lora.yaml      # gpt2 small lora低参微调启动配置
+    ├── run_gpt2_txtcls.yaml    # gpt2 small文本分类模型启动配置
+    ├── run_gpt2_xl.yaml        # gpt2 xlarge模型启动配置
+    └── run_model_xl_lora.yaml  # gpt2 xlarge lora低参微调启动配置
+```
+
 ## 3.3 模型迁移  
 在Mindspore中需要替换pytorch的API，例如下表（部分） ，可参考官方文档。
 
@@ -386,6 +412,17 @@ MindSpore采用动态计算图的方式，允许你在运行时动态地构建�
 基于GPT2和WikiText2数据集进行LoRA微调  
 更改train_dataset配置中的dataset_dir设置为处理好的数据路径  
 注意单击多卡、多机多卡等的设置    
+#### 单卡微调
+```bash
+python run_mindformer.py --config configs/gpt2/run_gpt2_lora.yaml --run_mode finetune
+```
+
+```bash
+cd scripts
+bash run_standalone.sh ../configs/gpt2/run_gpt2_lora.yaml [DEVICE_ID] finetune
+```
+
+
 ## 3.5测评  
 基于GPT2做LoRA微调后，进行两个方面的评测任务。
 ### 3.5.1 数据集介绍
@@ -403,7 +440,45 @@ MindSpore采用动态计算图的方式，允许你在运行时动态地构建�
 -  COLA数据集  
   -  COLA数据集来自语言理论的书籍和期刊，每个句子被标注为是否合乎语法的单词序列。  
 ### 3.5.2 文本生成      
-基于WikiText2数据集进行文本生成任务评测。    
+基于WikiText2数据集进行文本生成任务评测。   
+#### 处理数据成mindrecord格式
+
+```bash
+cd mindformers/tools/dataset_preprocess/gpt2
+python wikitext2_data_process.py --input_file {your_path/wiki.valid.tokens} \
+                             --output_file {your_path/wikitext-2.valid.mindrecord}
+```
+
+#### 开启评测
+
+```bash
+python run_mindformer.py --config configs/gpt2/run_gpt2_lora.yaml \
+                         --eval_dataset_dir {your_path/wikitext-2.valid.mindrecord} \
+                         --run_mode eval \
+                         --epochs 1
+```
+
+  | loss                | PPL                |
+  |---------------------|--------------------|
+  | 3.168492058227802   | 23.771611110457364 |
+  
 ### 3.5.3 文本分类    
 基于2SST-2、IMDB、AG-News、COLA等常用的文本分类数据集做文本分类测评。评测指标为ACC。      
-ACC: COLA-0.693, SST-2-0.808, IMDB-0.834, AG-News-0.841    
+ACC: COLA-0.693, SST-2-0.808, IMDB-0.834, AG-News-0.841
+数据集整理：  
+```bash
+cd mindformers/tools/dataset_preprocess/gpt2
+python txtcls_dataset_to_mindrecord.py --dataset_name {select one from ['cola', 'sst_2', 'ag_news', 'imdb']}
+                                     --input_file {your_path/train.tsv} \
+                                     --output_file {your_path/dataset_name.train.mindrecord}
+python txtcls_dataset_to_mindrecord.py --dataset_name {the same as above}
+                                     --input_file {your_path/dev.tsv} \
+                                     --output_file {your_path/dataset_name.dev.mindrecord}
+```  
+以ACC指标进行评测，可得到四个数据集的ACC结果。  
+
+  |              | CoLA  | IMDB  | STS-2  | AG-News |
+  |--------------|-------|-------|--------|---------|
+  | gpt2_lora    | 0.693 | 0.834 | 0.808  | 0.841   |
+
+
