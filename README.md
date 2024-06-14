@@ -43,7 +43,7 @@ pip install loralib
 ```
 ## 3.2 运行代码  
 先进行LoRA微调，随后进行测评。  
-分别基于NLU和NLU进行LoRA微调。    
+分别基于NLU和NLG进行LoRA微调。    
 ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%873.png)   
 ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%874.png)  
 # 4. Mindspore实现  
