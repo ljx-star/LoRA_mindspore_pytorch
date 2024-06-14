@@ -63,7 +63,7 @@ pip install loralib
 
 - 迁移时修改的对象及其属性、方法
 
-- |      | torch                          | mindspore                              | 注释                                                         |
+  |      | PyTorch APIs                          | MindSpore APIs                              | 说明                                                         |
   | ---- | ------------------------------ | -------------------------------------- | ------------------------------------------------------------ |
   | 1.   | torch.nn.Dropout               | mindspore.nn.Dropout                   | 参数的p改为keep_prob，两者之间是和为1的关系，需要转换        |
   | 2.   | torch.nn.Parameter             | mindspore.Parameter                    | 后者有更多的参数，包括**name**(str)与一些并行模式的配置(bool) |
@@ -95,7 +95,7 @@ pip install loralib
   - torch.nn → mindspore.nn
 - 迁移时修改的对象及其属性、方法：
 
-- |      | torch                  | mindspore                              | 注释                   |
+|      | PyTorch APIs                          | MindSpore APIs                              | 说明                                                         |
 | ---- | ---------------------- | -------------------------------------- | ---------------------- |
 | 1.   | torch.nn.Module       | mindspore.nn.Cell                      | 作为函数声明的参数存在 |
 | 2.   | torch.nn.Module.named_parameters | mindspore.nn.Cell.parameters_and_names |                        |
