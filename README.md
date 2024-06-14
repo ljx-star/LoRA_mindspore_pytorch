@@ -2,21 +2,21 @@
 
 # 1. 论文介绍  
 ## 1.1 背景介绍  
-LoRA模型，全称Low-Rank Adaptation of Large Language Models，是一种用于微调大型语言模型的低秩适应技术。它最初应用于NLP领域，特别是用于微调GPT-3等模型。LoRA通过仅训练低秩矩阵，然后将这些参数注入到原始模型中，从而实现对模型的微调。这种方法不仅减少了计算需求，而且使得训练资源比直接训练原始模型要小得多，因此非常适合在资源有限的环境中使用。
-这种方法通过在模型的低秩特征空间中进行适配，而不是直接修改模型的全连接层或卷积层，从而实现了更高效和可控的模型微调。LORA模型的核心思想是在模型的特征空间中引入辅助特征，这些辅助特征用于捕捉特定任务或领域的信息。这些辅助特征通过低秩分解与原始特征相结合，从而实现对模型的微调。
+-  LoRA模型，全称Low-Rank Adaptation of Large Language Models，是一种用于微调大型语言模型的低秩适应技术。它最初应用于NLP领域，特别是用于微调GPT-3等模型。LoRA通过仅训练低秩矩阵，然后将这些参数注入到原始模型中，从而实现对模型的微调。这种方法不仅减少了计算需求，而且使得训练资源比直接训练原始模型要小得多，因此非常适合在资源有限的环境中使用。
+-  这种方法通过在模型的低秩特征空间中进行适配，而不是直接修改模型的全连接层或卷积层，从而实现了更高效和可控的模型微调。LORA模型的核心思想是在模型的特征空间中引入辅助特征，这些辅助特征用于捕捉特定任务或领域的信息。这些辅助特征通过低秩分解与原始特征相结合，从而实现对模型的微调。
   
 ## 1.2 论文方法  
-LoRA 对Stable Diffusion模型中最关键的部分进行微小改动：交叉注意力层。这是模型中图像和提示相遇的部分。论文发现，仅微调模型的这一部分就足以实现良好的训练效果。交叉注意力层在下方的Stable Diffusion模型架构中以黄色部分表示。
+-  LoRA 对Stable Diffusion模型中最关键的部分进行微小改动：交叉注意力层。这是模型中图像和提示相遇的部分。论文发现，仅微调模型的这一部分就足以实现良好的训练效果。交叉注意力层在下方的Stable Diffusion模型架构中以黄色部分表示。
 
- ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%871.png)  
+-   ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%871.png)  
 
-LoRA 通过在冻结原始权重的同时学习秩分解矩阵对来减少可训练参数的数量。 这大大降低了适用于特定任务的大型语言模型的存储需求，并在部署期间实现了高效的任务切换，所有这些都不会引入推理延迟。 LoRA 还优于其他几种适配方法，包括适配器、前缀调整和微调。使用 RoBERTa （Liu et al.， 2019） base and large 和 DeBERTa （He et al.， 2020） XXL 1.5B 在 GLUE 基准上获得与完全微调相当或优于完全微调的结果，同时仅训练和存储一小部分参数。
-在 GPT-2 上，LoRA 与完全微调和其他高效调优方法相比都具有优势，在 E2E NLG Challenge、DART 和 WebNLG 上进行了评估。
-![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%872.png)  
+-  LoRA 通过在冻结原始权重的同时学习秩分解矩阵对来减少可训练参数的数量。 这大大降低了适用于特定任务的大型语言模型的存储需求，并在部署期间实现了高效的任务切换，所有这些都不会引入推理延迟。 LoRA 还优于其他几种适配方法，包括适配器、前缀调整和微调。使用 RoBERTa （Liu et al.， 2019） base and large 和 DeBERTa （He et al.， 2020） XXL 1.5B 在 GLUE 基准上获得与完全微调相当或优于完全微调的结果，同时仅训练和存储一小部分参数。
+-  在 GPT-2 上，LoRA 与完全微调和其他高效调优方法相比都具有优势，在 E2E NLG Challenge、DART 和 WebNLG 上进行了评估。
+-  ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%872.png)  
 
 # 3.基于pytorch框架的论文复现和小规模迁移
 ## 3.1 环境准备与配置（TODO）
-创建环境：  
+-  创建环境：  
 ```     
 conda create -n lora python=3.8    
 ```   
@@ -27,12 +27,12 @@ pip install loralib
 #pip install git+https://github.com/microsoft/LoRA    
 ```
 
-先进行LoRA微调，随后进行测评。  
-分别基于NLU和NLG进行LoRA微调。    
+-  先进行LoRA微调，随后进行测评。  
+-  分别基于NLU和NLG进行LoRA微调。    
 ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%873.png)   
 ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/blob/master/ma-user/%E5%9B%BE%E7%89%874.png)  
 
-## 3.2 实验复现与设计
+## 3.2 实验设计与复现
 
 ### 3.2.1 实验的总体设计
 
@@ -40,7 +40,7 @@ pip install loralib
 ### 3.2.2 数据集与评测流程
 
 
-### 3.2.3 实验结果与结论
+### 3.2.3 实验数据与结论
 
 
 ## 3.3 算法核心部分的迁移
@@ -102,7 +102,6 @@ pip install loralib
 | 3.   | torch.nn.Module.modules          | mindspore.nn.Cell.cells_and_names                  |                        |
 | 4.   | torch.nn.Module.state_dict       | mindspore.nn.Cell.parameters_dict                  |                        |
 
-- 于是完成了loralib库的从pytorch架构向mindspore架构的迁移
 
 
 # 4. 基于Mindspore架构的实现与简单评测  
