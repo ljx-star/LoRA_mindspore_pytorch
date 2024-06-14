@@ -13,8 +13,8 @@
 -  LoRA 通过在冻结原始权重的同时学习秩分解矩阵对来减少可训练参数的数量。 这大大降低了适用于特定任务的大型语言模型的存储需求，并在部署期间实现了高效的任务切换，所有这些都不会引入推理延迟。 LoRA 还优于其他几种适配方法，包括适配器、前缀调整和微调。使用 RoBERTa （Liu et al.， 2019） base and large 和 DeBERTa （He et al.， 2020） XXL 1.5B 在 GLUE 基准上获得与完全微调相当或优于完全微调的结果，同时仅训练和存储一小部分参数。
 -  在 GPT-2 上，LoRA 与完全微调和其他高效调优方法相比都具有优势，在 E2E NLG Challenge、DART 和 WebNLG 上进行了评估。
 
-# 3.基于pytorch框架的论文复现和小规模迁移
-## 3.1 环境准备与配置
+# 2.基于pytorch框架的论文复现和小规模迁移
+## 2.1 环境准备与配置
 -  创建环境：  
 ```bash
 conda create -n lora python=3.8
@@ -29,9 +29,9 @@ pip install loralib
 -  各类任务相关数据集的配置
 -  各类任务metric计算相关仓库的配置
 
-## 3.2 实验设计与复现
+## 2.2 实验设计与复现
 
-### 3.2.1 实验的总体设计
+### 2.2.1 实验的总体设计
 - 针对自然语言生成任务（NLG）与自然语言理解任务（NLU）分别设计实验
 - 数据集采用GLUE和E2E NLG Challenge
 - NLG任务：
@@ -45,7 +45,7 @@ pip install loralib
   - 实现LoRA方法对比全参数FT
   - 完成GLUE benchmark的相关子任务并采用对应metric评价
 
-### 3.2.2 数据集介绍
+### 2.2.2 数据集介绍
 - GLUE benchmark数据集：
   - 即General Language Understanding Evaluation。它包含三类多种子任务，分别是单句任务、相似性和转述任务、以及推理任务
   - 其分类情形、相关规模、对应metric有下图解释
@@ -69,7 +69,7 @@ pip install loralib
   - 数据集评估指标包括BLEU、NIST、METEOR、ROUGE-L和CIDEr 
 
 
-### 3.2.3 实验流程分析
+### 2.2.3 实验流程分析
 - NLG任务流程：
 
   1. 初始预训练大模型的微调：`gpt2_ft.py`
@@ -211,12 +211,12 @@ pip install loralib
      
   - 注：MNLI任务是RTE和STS-B任务的前置任务；另外modelarts只有单卡的配置，故修改了分布式训练代码
 
-### 3.2.3 实验数据与结论
+### 2.2.3 实验数据与结论
 -  由于modelarts平台的计算资源与时间限制，故主要完成了LoRA模型的实验，全参数微调（FT）部分参考论文记录的实验结果及其他平台的实验结果
   
 -  NLG部分：
  
-- |           | BLEU | NIST | MET  | ROUGE-L | CIDEr |
+- |          | BLEU | NIST | MET  | ROUGE-L | CIDEr |
   |----------|------|------|------|---------|-------|
   | M-LoRA   | 70.4 | 8.85 | 46.8 | 71.8    | 2.53  |
   | M-FT     | 68.2 | 8.62 | 46.2 | 71.0    | 2.47  |
@@ -240,7 +240,7 @@ pip install loralib
   - 与全参数微调相比，输出质量相当甚至更优，说明微调了关键参数
   - 是能够有效应用于LLM微调场景的方法
 
-## 3.3 算法核心部分的迁移
+## 2.3 算法核心部分的迁移
 
 - 本部分主要考虑对loralib库中py文件从pytorch架构向mindspore架构的迁移
 - microsoft/LoRA仓库的其余部分均可认定为LoRA在针对NLU和NLG任务时在具体数据集上的实验设计部分
@@ -301,8 +301,8 @@ pip install loralib
 
 
 
-# 4. 基于Mindspore架构的实现与简单评测  
-## 4.1 框架介绍  
+# 3. 基于Mindspore架构的实现与简单评测  
+## 3.1 框架介绍  
 昇思MindSpore是由华为于2019年8月推出的新一代全场景AI框架，2020年3月28日，华为宣布昇思MindSpore正式开源。昇思MindSpore是一个全场景AI框架，旨在实现易开发、高效执行、全场景统一部署三大目标。
 MindSpore是华为推出的一款开源深度学习框架。它提供了一套端到端的开发工具和算法库，旨在简化深度学习模型的开发、训练和部署过程。   
 ### 与其他深度学习框架相比，MindSpore有以下几个特点： 
@@ -318,9 +318,9 @@ MindSpore采用动态计算图的方式，允许你在运行时动态地构建�
 计算图是MindSpore用来描述计算流程的概念。它由一系列的计算节点和数据流组成，表示了模型的计算过程。在MindSpore中，你可以构建一个计算图来定义神经网络的结构和操作。计算图定义了数据从输入到输出的流动路径和相应的计算操作，计算图的优势在于它能够 自动记录 模型中的计算过程，并且可以进行自动微分来进行反向传播和参数更新。它使得深度学习框架能够高效地执行各种复杂的计算操作。
 #### 3.操作符（Operator）    
 在MindSpore中，操作符是用来进行各种数学和逻辑运算的函数或方法。它们可以用于对张量进行加法、乘法、卷积等操作，构建复杂的计算流程。    
-## 4.2 环境准备  
+## 3.2 环境准备  
 基于华为云服务区，在Modelarts中创建mindspore_2.1.0-cann_6.3.2-py_3.7-euler_2.10.7-aarch64-snt9b环境（Ascend Snt9b+ARM algorithm development and training. MindSpore is preset in the AI engine.）
-## 4.3 模型迁移  
+## 3.3 模型迁移  
 在Mindspore中需要替换pytorch的API，例如下表（部分） ，可参考官方文档。
 
 | PyTorch APIs                                                                           | MindSpore APIs                                                                                                                                                          | 说明                                                                                                                     |
@@ -382,13 +382,13 @@ MindSpore采用动态计算图的方式，允许你在运行时动态地构建�
 
 
 另外，需注意nn.Module、linear等。  
-## 4.4微调  
+## 3.4微调  
 基于GPT2和WikiText2数据集进行LoRA微调  
 更改train_dataset配置中的dataset_dir设置为处理好的数据路径  
 注意单击多卡、多机多卡等的设置    
-## 4.5测评  
+## 3.5测评  
 基于GPT2做LoRA微调后，进行两个方面的评测任务。
-### 4.5.1 数据集介绍
+### 3.5.1 数据集介绍
 -  使用包括WikiText2、2SST-2、IMDB、AG-News、COLA等常用的大模型数据集  
 -  WikiText2数据集 
   1、数据来源：Wikitext-2数据集是从维基百科抽取的，包含了维基百科中的文章文本。   
@@ -402,8 +402,8 @@ MindSpore采用动态计算图的方式，允许你在运行时动态地构建�
   -  AG-News数据集包含496,835条来自AG新闻语料库4大类别超过2000个新闻源的新闻文章。  
 -  COLA数据集  
   -  COLA数据集来自语言理论的书籍和期刊，每个句子被标注为是否合乎语法的单词序列。  
-### 4.5.2 文本生成      
+### 3.5.2 文本生成      
 基于WikiText2数据集进行文本生成任务评测。    
-### 4.5.3 文本分类    
+### 3.5.3 文本分类    
 基于2SST-2、IMDB、AG-News、COLA等常用的文本分类数据集做文本分类测评。评测指标为ACC。      
 ACC: COLA-0.693, SST-2-0.808, IMDB-0.834, AG-News-0.841    
