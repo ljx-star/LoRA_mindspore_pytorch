@@ -16,213 +16,229 @@
 # 3.基于pytorch框架的论文复现和小规模迁移
 ## 3.1 环境准备与配置
 -  创建环境：  
-```linux
-conda create -n lora python=3.8    
-```   
+```bash
+conda create -n lora python=3.8
+```
 -  loralib:  
-```linux   
+```bash 
 pip install loralib  
 #Alternatively    
-#pip install git+https://github.com/microsoft/LoRA    
+#pip install git+https://github.com/microsoft/LoRA
 ```
--  预训练模型和各类任务相关数据集的配置
--  各类任务的metric计算相关仓库配置
+-  各类任务使用预训练模型的配置
+-  各类任务相关数据集的配置
+-  各类任务metric计算相关仓库的配置
 
 ## 3.2 实验设计与复现
 
 ### 3.2.1 实验的总体设计
--  针对自然语言生成任务（NLG）与自然语言理解任务（NLU）分别设计实验
--  数据集采用GLUE和E2E NLG Challenge
--  NLG任务：
-  -  使用GPT-2模型
-  -  采用GPT-2 S 和GPT-2 M版本
-  -  实现LoRA方法对比全参数FT
-  -  完成E2E NLG Challenge任务并采用多种metric评价
-    
--  NLU任务：
-  -  使用RoBERTa模型
-  -  采用RoBERTa base版本和RoBERTa large版本
-  -  实现LoRA方法对比全参数FT
-  -  完成GLUE benchmark的相关子任务并采用对应metric评价
+- 针对自然语言生成任务（NLG）与自然语言理解任务（NLU）分别设计实验
+- 数据集采用GLUE和E2E NLG Challenge
+- NLG任务：
+  - 使用GPT-2模型
+  - 采用GPT-2 S 和GPT-2 M版本
+  - 实现LoRA方法对比全参数FT
+  - 完成E2E NLG Challenge任务并采用多种metric评价
+- NLU任务：
+  - 使用RoBERTa模型
+  - 采用RoBERTa base版本和RoBERTa large版本
+  - 实现LoRA方法对比全参数FT
+  - 完成GLUE benchmark的相关子任务并采用对应metric评价
 
 ### 3.2.2 数据集介绍
--  GLUE benchmark数据集：
-  -  即General Language Understanding Evaluation。它包含三类多种子任务，分别是单句任务、相似性和转述任务、以及推理任务
-  -  其分类情形、相关规模、对应metric有下图解释
--  ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/assets/102862025/1a2c1dd8-9933-4888-900a-c1e4abebdfd1)
-  -  考虑使用CoLA、MNLI、STS-B、RTE作为三类任务的代表任务进行实验，其中MNLI任务同时作为RTE和STS-B的前置任务存在
-  -  考虑使用的metric如下：
-    -  CoLA:	Matthew’s correlation
-    -  NLI:	accuracy
-    -  RTE:	accuracy
-    -  STS-B:	Pearson correlation
+- GLUE benchmark数据集：
+  - 即General Language Understanding Evaluation。它包含三类多种子任务，分别是单句任务、相似性和转述任务、以及推理任务
+  - 其分类情形、相关规模、对应metric有下图解释
+  -  ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/assets/102862025/1a2c1dd8-9933-4888-900a-c1e4abebdfd1)
+  - 考虑使用CoLA、MNLI、STS-B、RTE作为三类任务的代表任务进行实验，其中MNLI任务同时作为RTE和STS-B的前置任务存在
+  - 考虑使用的metric如下：
+    - CoLA:	Matthew’s correlation
+    - NLI:	accuracy
+    - RTE:	accuracy
+    - STS-B:	Pearson correlation
+      
 
--  E2E NLG Challenge数据集：
-  -  源码中体现为三个数据集：dart、e2e、nlg challenge，本实验以e2e为主
-  -  该数据集的使用键值对这一数据结构设置来生成自然语言文本，如下图所示
-- [image](https://github.com/ljx-star/LoRA_mindspore_pytorch/assets/102862025/5da45268-13b2-426b-9f8c-c8f6ae1270b9)
-  -  该数据集生成的文本为为相关物品描述，故用于评估端到端自然语言生成系统在生成任务上的表现。
-  -  e2e数据集特指在生成餐馆描述任务上的表现，如下图所示
--  ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/assets/102862025/9ce6dc94-6015-4fb0-8274-94203fdc978e)
-  -  e2e数据集具备中等规模：训练集约42000对键值对；测试集和验证集均为约4600对键值对
-  -  数据集评估指标包括BLEU、NIST、METEOR、ROUGE-L和CIDEr 
+- E2E NLG Challenge数据集：
+  - 源码中体现为三个数据集：dart、e2e、nlg challenge，本实验以e2e为主
+  - 该数据集的使用键值对这一数据结构设置来生成自然语言文本，如下图所示
+  - ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/assets/102862025/5da45268-13b2-426b-9f8c-c8f6ae1270b9)
+  - 该数据集生成的文本为为相关物品描述，故用于评估端到端自然语言生成系统在生成任务上的表现。
+  - e2e数据集特指在生成餐馆描述任务上的表现，如下图所示
+  - ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/assets/102862025/9ce6dc94-6015-4fb0-8274-94203fdc978e)
+  - e2e数据集具备中等规模：训练集约42000对键值对；测试集和验证集均为约4600对键值对
+  - 数据集评估指标包括BLEU、NIST、METEOR、ROUGE-L和CIDEr 
 
 
 ### 3.2.3 实验流程分析
--  NLG任务流程：
+- NLG任务流程：
+
   1. 初始预训练大模型的微调：`gpt2_ft.py`
-  -  改良脚本如下：
-  -  ```linux   
-MASTER_ADDR=localhost \
-MASTER_PORT=12355 \
-WORLD_SIZE=1 \
-RANK=0 \
-CUDA_VISIBLE_DEVICES=0 \
-python src/gpt2_ft.py \
-    --train_data ./data/e2e/train.jsonl \
-    --valid_data ./data/e2e/valid.jsonl \
-    --train_batch_size 2 \
-    --grad_acc 1 \
-    --valid_batch_size 1 \
-    --seq_len 512 \
-    --model_card gpt2.sm \
-    --init_checkpoint ./pretrained_checkpoints/gpt2-pytorch_model.bin \
-    --platform local \
-    --clip 0.0 \
-    --lr 0.0002 \
-    --weight_decay 0.01 \
-    --correct_bias \
-    --adam_beta2 0.999 \
-    --scheduler linear \
-    --warmup_step 500 \
-    --max_epoch 5 \
-    --save_interval 1000 \
-    --lora_dim 4 \
-    --lora_alpha 32 \
-    --lora_dropout 0.1 \
-    --label_smooth 0.1 \
-    --work_dir ./trained_models/GPT2/e2e \
-    --random_seed 110
 
-    ```
-  -  ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/assets/102862025/e193bbbb-46fd-47e9-b478-3e3da5a01aed)
-  -  注：原始代码有epoch中途保存的模型以及每个epoch结束保存的模型，就实验结果来看，建议选择后者
-  2. 微调大模型的推理及结果的束搜索采样: `gpt2.beam.py`
-  -  改良脚本如下：
-  -  ```linux   
-MASTER_ADDR=localhost \
-MASTER_PORT=12355 \
-WORLD_SIZE=1 \
-RANK=0 \
-CUDA_VISIBLE_DEVICES=0 \
-python src/gpt2_beam.py \
-    --data ./data/e2e/test.jsonl \
-    --batch_size 4 \
-    --seq_len 512 \
-    --eval_len 64 \
-    --model_card gpt2.sm \
-    --init_checkpoint ./trained_models/GPT2/e2e/model.21031.pt \
-    --platform local \
-    --lora_dim 4 \
-    --lora_alpha 32 \
-    --beam 10 \
-    --length_penalty 0.8 \
-    --no_repeat_ngram_size 4 \
-    --repetition_penalty 1.0 \
-    --eos_token_id 628 \
-    --work_dir ./trained_models/GPT2/e2e \
-    --output_file predict.21031.jsonl
-  
-    ```
-  ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/assets/102862025/d133ea6a-7548-4b58-8331-52a351bfbe6b)
+     - 改良脚本如下：
 
-  -  注：原始代码中途不输出结果，仅完成全部采样后输出结果。本文对此添加了save—interval的优化，但会导致 `gpt2.decode.py`部分需要进一步更改以避免空字典bug，因此最好不取中途的结果
-  3. 微调大模型的推理结果的解码: `gpt2.decode.py`
-     -  改良脚本如下：
-  -  ```linux   
-MASTER_ADDR=localhost \
-MASTER_PORT=12355 \
-WORLD_SIZE=1 \
-RANK=0 \
-CUDA_VISIBLE_DEVICES=0 \
-python src/gpt2_decode.py \
-    --vocab ./vocab \
-    --sample_file ./trained_models/GPT2/e2e/predict.21031_step_final.jsonl \
-    --input_file ./data/e2e/test_formatted.jsonl \
-    --output_ref_file e2e_ref.txt \
-    --output_pred_file e2e_pred.txt
-    ```
-  4.  微调大模型的推理结果的解码: eval相关部分
-  -  改良脚本如下：
-  -  ```linux   
-python eval/e2e/measure_scores.py e2e_ref.txt e2e_pred.txt -p
-    ```
+     - ```bash
+       MASTER_ADDR=localhost \
+        MASTER_PORT=12355 \
+        WORLD_SIZE=1 \
+        RANK=0 \
+        CUDA_VISIBLE_DEVICES=0 \
+        python src/gpt2_ft.py \
+        --train_data ./data/e2e/train.jsonl \
+        --valid_data ./data/e2e/valid.jsonl \
+        --train_batch_size 2 \
+        --grad_acc 1 \
+        --valid_batch_size 1 \
+        --seq_len 512 \
+        --model_card gpt2.sm \
+        --init_checkpoint ./pretrained_checkpoints/gpt2-pytorch_model.bin \
+        --platform local \
+        --clip 0.0 \
+        --lr 0.0002 \
+        --weight_decay 0.01 \
+        --correct_bias \
+        --adam_beta2 0.999 \
+        --scheduler linear \
+        --warmup_step 500 \
+        --max_epoch 5 \
+        --save_interval 1000 \
+        --lora_dim 4 \
+        --lora_alpha 32 \
+        --lora_dropout 0.1 \
+        --label_smooth 0.1 \
+        --work_dir ./trained_models/GPT2/e2e \
+        --random_seed 110
+       ```
+     - ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/assets/102862025/e193bbbb-46fd-47e9-b478-3e3da5a01aed)
+
+     - 注：原始代码有epoch中途保存的模型以及每个epoch结束保存的模型，就实验结果来看，建议选择后者
+
+  2. 微调大模型的推理及结果的束搜索采样: `gpt2_beam.py`
+
+     - 改良脚本如下：
+
+     - ```bash
+       MASTER_ADDR=localhost \
+       MASTER_PORT=12355 \
+       WORLD_SIZE=1 \
+       RANK=0 \
+       CUDA_VISIBLE_DEVICES=0 \
+       python src/gpt2_beam.py \
+           --data ./data/e2e/test.jsonl \
+           --batch_size 4 \
+           --seq_len 512 \
+           --eval_len 64 \
+           --model_card gpt2.sm \
+           --init_checkpoint ./trained_models/GPT2/e2e/model.21031.pt \
+           --platform local \
+           --lora_dim 4 \
+           --lora_alpha 32 \
+           --beam 10 \
+           --length_penalty 0.8 \
+           --no_repeat_ngram_size 4 \
+           --repetition_penalty 1.0 \
+           --eos_token_id 628 \
+           --work_dir ./trained_models/GPT2/e2e \
+           --output_file predict.21031.jsonl 
+       ```
+
+     - ![image](https://github.com/ljx-star/LoRA_mindspore_pytorch/assets/102862025/d133ea6a-7548-4b58-8331-52a351bfbe6b)
+
+       - 注：原始代码中途不输出结果，仅完成全部采样后输出结果。本文对此添加了save—interval的优化，但会导致 `gpt2_decode.py`部分需要进一步更改以避免空字典bug，因此最好不取中途的结果
+
+  3. 微调大模型的推理结果的解码: `gpt2_decode.py`
+     - 改良脚本如下：
+
+     - ```bash
+       MASTER_ADDR=localhost \
+       MASTER_PORT=12355 \
+       WORLD_SIZE=1 \
+       RANK=0 \
+       CUDA_VISIBLE_DEVICES=0 \
+       python src/gpt2_decode.py \
+           --vocab ./vocab \
+           --sample_file ./trained_models/GPT2/e2e/predict.21031_step_final.jsonl \
+           --input_file ./data/e2e/test_formatted.jsonl \
+           --output_ref_file e2e_ref.txt \
+           --output_pred_file e2e_pred.txt
+       ```
+
+  4. 微调大模型的推理结果的解码: eval相关部分
+     - 改良脚本如下：
+
+     - ```bash
+        python eval/e2e/measure_scores.py e2e_ref.txt e2e_pred.txt -p
+       ```
+
 
 -  NLU任务流程：`run_glue.py`
-  -  改良脚本如下：以CoLA为例
-  -  ```linux   
-export model_dir="./pretrained_checkpoints"
-export task="cola"
-export data_dir="./glue/$task"
-export output_dir="./result/$task"
-MASTER_ADDR=localhost \
-MASTER_PORT=12355 \
-WORLD_SIZE=1 \
-RANK=0 \
-CUDA_VISIBLE_DEVICES=0 \
-python examples/text-classification/run_glue.py \
---model_name_or_path $model_dir/RoBERTa-base \
---train_file $data_dir/train.csv \
---test_file $data_dir/test.csv \
---validation_file $data_dir/dev.csv \
---do_train \
---do_eval \
---max_seq_length 512 \
---per_device_train_batch_size 32 \
---learning_rate 4e-4 \
---num_train_epochs 80 \
---output_dir $output_dir/model \
---overwrite_output_dir \
---logging_steps 10 \
---logging_dir $output_dir/log \
---evaluation_strategy epoch \
---save_strategy epoch \
---warmup_ratio 0.06 \
---apply_lora \
---lora_r 8 \
---lora_alpha 16 \
---seed 0 \
---weight_decay 0.1
-#--task_name cola \
-    ```
-    注：MNLI任务是RTE和STS-B任务的前置任务；另外modelarts只有单卡的配置，故修改了分布式训练代码；
+   - 改良脚本如下：以CoLA为例
+
+   - ```bash
+      export model_dir="./pretrained_checkpoints"
+      export task="cola"
+      export data_dir="./glue/$task"
+      export output_dir="./result/$task"
+      MASTER_ADDR=localhost \
+      MASTER_PORT=12355 \
+      WORLD_SIZE=1 \
+      RANK=0 \
+      CUDA_VISIBLE_DEVICES=0 \
+      python examples/text-classification/run_glue.py \
+      --model_name_or_path $model_dir/RoBERTa-base \
+      --train_file $data_dir/train.csv \
+      --test_file $data_dir/test.csv \
+      --validation_file $data_dir/dev.csv \
+      --do_train \
+      --do_eval \
+      --max_seq_length 512 \
+      --per_device_train_batch_size 32 \
+      --learning_rate 4e-4 \
+      --num_train_epochs 80 \
+      --output_dir $output_dir/model \
+      --overwrite_output_dir \
+      --logging_steps 10 \
+      --logging_dir $output_dir/log \
+      --evaluation_strategy epoch \
+      --save_strategy epoch \
+      --warmup_ratio 0.06 \
+      --apply_lora \
+      --lora_r 8 \
+      --lora_alpha 16 \
+      --seed 0 \
+      --weight_decay 0.1
+      #--task_name cola \
+     ```
+     
+  - 注：MNLI任务是RTE和STS-B任务的前置任务；另外modelarts只有单卡的配置，故修改了分布式训练代码
 
 ### 3.2.3 实验数据与结论
 -  由于modelarts平台的计算资源与时间限制，故主要完成了LoRA模型的实验，全参数微调（FT）部分参考论文记录的实验结果及其他平台的实验结果
--  
+  
 -  NLG部分：
--  |        | BLEU | NIST | MET  | ROUGE-L | CIDEr |
-|--------|------|------|------|---------|-------|
-| M-LoRA | 70.4 | 8.85 | 46.8 | 71.8    | 2.53  |
-| M-FT   | 68.2 | 8.62 | 46.2 | 71.0    | 2.47  |
-| S-LoRA | 64.6 | 8.47 | 42.9 | 64.5    | 2.16  |
-| S-FT   | 62.1 | 8.20 | 42.3 | 63.7    | 2.09  |
+ 
+- |           | BLEU | NIST | MET  | ROUGE-L | CIDEr |
+  |----------|------|------|------|---------|-------|
+  | M-LoRA   | 70.4 | 8.85 | 46.8 | 71.8    | 2.53  |
+  | M-FT     | 68.2 | 8.62 | 46.2 | 71.0    | 2.47  |
+  | S-LoRA   | 64.6 | 8.47 | 42.9 | 64.5    | 2.16  |
+  | S-FT     | 62.1 | 8.20 | 42.3 | 63.7    | 2.09  |
+
 
 -  NLU部分：
--  |            | CoLA | MNLI | STS-B | RTE  |
-|------------|------|------|-------|------|
-| large-LoRA | 68.2 | 90.6 | 92.3  | 85.2 |
-| large-FT   | 68.0 | 90.2 | 92.4  | 86.6 |
-| base-LoRA  | 63.4 | 87.5 | 91.5  | 86.6 |
-| base-FT    | 63.6 | 87.6 | 91.2  | 78.7 |
 
--   实验过程证明全参数微调的训练参数、占用资源和耗时远超LoRA；而实验数据两者任务能力基本相当，甚至是LoRA相对占优
--   我们可以得出如下结论：
--   LoRA模型本身
-  -  降低了待训练参数量
-  -  大幅节省了微调耗时和占用资源
-  -  与全参数微调相比，输出质量相当甚至更优，说明微调了关键参数
-  -  是能够有效应用于LLM微调场景的方法
+- |              | CoLA | MNLI | STS-B | RTE  |
+  |--------------|------|------|-------|------|
+  | large-LoRA   | 68.2 | 90.6 | 92.3  | 85.2 |
+  | large-FT     | 68.0 | 90.2 | 92.4  | 86.6 |
+  | base-LoRA    | 63.4 | 87.5 | 91.5  | 86.6 |
+  | base-FT      | 63.6 | 87.6 | 91.2  | 78.7 |
+
+- 实验过程证明全参数微调的训练参数、占用资源和耗时远超LoRA；而实验数据两者任务能力基本相当，甚至是LoRA相对占优
+- 我们可以得出如下结论：LORA模型本身
+  - 降低了待训练参数量
+  - 大幅节省了微调耗时和占用资源
+  - 与全参数微调相比，输出质量相当甚至更优，说明微调了关键参数
+  - 是能够有效应用于LLM微调场景的方法
 
 ## 3.3 算法核心部分的迁移
 
@@ -276,12 +292,12 @@ python examples/text-classification/run_glue.py \
   - torch.nn → mindspore.nn
 - 迁移时修改的对象及其属性、方法：
 
-|      | PyTorch APIs                          | MindSpore APIs                              | 说明                                                         |
-| ---- | ---------------------- | -------------------------------------- | ---------------------- |
-| 1.   | torch.nn.Module       | mindspore.nn.Cell                      | 作为函数声明的参数存在 |
-| 2.   | torch.nn.Module.named_parameters | mindspore.nn.Cell.parameters_and_names |                        |
-| 3.   | torch.nn.Module.modules          | mindspore.nn.Cell.cells_and_names                  |                        |
-| 4.   | torch.nn.Module.state_dict       | mindspore.nn.Cell.parameters_dict                  |                        |
+  |      | PyTorch APIs                          | MindSpore APIs                              | 说明                                                         |
+  | ---- | ---------------------- | -------------------------------------- | ---------------------- |
+  | 1.   | torch.nn.Module       | mindspore.nn.Cell                      | 作为函数声明的参数存在 |
+  | 2.   | torch.nn.Module.named_parameters | mindspore.nn.Cell.parameters_and_names |                        |
+  | 3.   | torch.nn.Module.modules          | mindspore.nn.Cell.cells_and_names                  |                        |
+  | 4.   | torch.nn.Module.state_dict       | mindspore.nn.Cell.parameters_dict                  |                        |
 
 
 
