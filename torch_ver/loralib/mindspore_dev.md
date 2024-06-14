@@ -46,11 +46,11 @@
 - 迁移时修改的对象及其属性、方法：
 
 - |      | torch                  | mindspore                              | 注释                   |
-| ---- | ---------------------- | -------------------------------------- | ---------------------- |
-| 1.   | torch.nn.Module       | mindspore.nn.Cell                      | 作为函数声明的参数存在 |
-| 2.   | torch.nn.Module.named_parameters | mindspore.nn.Cell.parameters_and_names |                        |
-| 3.   | torch.nn.Module.modules          | mindspore.nn.Cell.cells_and_names                  |                        |
-| 4.   | torch.nn.Module.state_dict       | mindspore.nn.Cell.parameters_dict                  |                        |
+  | ---- | ---------------------- | -------------------------------------- | ---------------------- |
+  | 1.   | torch.nn.Module       | mindspore.nn.Cell                      | 作为函数声明的参数存在 |
+  | 2.   | torch.nn.Module.named_parameters | mindspore.nn.Cell.parameters_and_names |                        |
+  | 3.   | torch.nn.Module.modules          | mindspore.nn.Cell.cells_and_names                  |                        |
+  | 4.   | torch.nn.Module.state_dict       | mindspore.nn.Cell.parameters_dict                  |                        |
 
 
 ### 其余部分
