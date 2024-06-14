@@ -1,0 +1,8 @@
+r1.1.0
+commit 9401c205
+Merge: 98713b62 d0db6e91
+Author: i-robot <huawei_ci_bot@163.com>
+Date:   Fri Apr 26 01:12:16 2024 +0000
+
+    !2841 【BUGFIX】修复AdamWeightDecayZeRO2优化器bug
+    Merge pull request !2841 from kairui_kou/dev_bugfix
